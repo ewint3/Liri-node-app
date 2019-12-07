@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/ewint3/Liri-node-app/issues"
   },
-  "homepage": "https://github.com/ewint3/Liri-node-app#readme"
+  "homepage": "https://github.com/ewint3/Liri-node-app#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  }
 }

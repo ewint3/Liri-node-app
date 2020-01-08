@@ -1,33 +1,30 @@
 require("dotenv").config();
-var keys = require("./keys")
-var Spotify = require("node-spotify-api")
-var dateFormat = require("dateFormat")
-var fs = require("fs")
+var keys = require("./keys");
+var axios = require("axios");
+var Spotify = require("node-spotify-api");
+var dateFormat = require("dateFormat");
+var fs = require("fs");
 
-// Takes an artist and searches the Bands in Town 
-// Artist API for an artist and render information
-var concertThis = function(artist){
+var concertThis = function (artist) {
     var region = ""
-    var queryUrl = "https://rest.bandsintown.com/artists/" + artist.replace(" ", "+") + "/events?app_id=codingbootcamp"
-    //console.log(queryUrl);
-    
-    request(queryUrl, function(err, response, body){
-        // If the request is successful
+    var queryUrl = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp"
+
+
+    request(queryUrl, function (err, response, body) {
+
         if (!err && response.statusCode === 200) {
-            // Save parsed body in a new variable for easier use
+
             var concertInfo = JSON.parse(body)
-            
+
             outputData(artist + " concert information:")
 
-            for (i=0; i < concertInfo.length; i++) {
-                
+            for (i = 0; i < concertInfo.length; i++) {
+
                 region = concertInfo[i].venue.region
-                 //handle Canadian venues
+
                 if (region === "") {
                     region = concertInfo[i].venue.country
                 }
-
-                // Need to return Name of venue, Venue location, Date of event (MM/DD/YYYY)
                 outputData("Venue: " + concertInfo[i].venue.name)
                 outputData("Location: " + concertInfo[i].venue.city + ", " + region);
                 outputData("Date: " + dateFormat(concertInfo[i].datetime, "mm/dd/yyyy"))
@@ -36,21 +33,17 @@ var concertThis = function(artist){
     })
 }
 
-// This will take a song, search spotify and return information
-var spotifyThisSong = function(song){
-    // Default should be "The Sign" by Ace of Base
-    if (!song){
+var spotifyThisSong = function (song) {
+    if (!song) {
         song = "The Sign Ace of Base"
     }
-
     var spotify = new Spotify(keys.spotify);
 
-    spotify.search({type: "track", query: song, limit: 1}, function (err, data){
+    spotify.search({ type: "track", query: song, limit: 1 }, function (err, data) {
         if (err) {
             return console.log(err)
         }
 
-        // Need to return Artist(s), Song Name, Album, Preview link of song from Spotify
         var songInfo = data.tracks.items[0]
         outputData(songInfo.artists[0].name)
         outputData(songInfo.name)
@@ -59,10 +52,8 @@ var spotifyThisSong = function(song){
     })
 }
 
-// This will take a movie, search IMDb and return information
-var movieThis = function(movie){
-    // Default should be "Mr. Nobody"
-    if (!movie){
+var movieThis = function (movie) {
+    if (!movie) {
         movie = "Mr.+Nobody"
     }
 
@@ -70,7 +61,7 @@ var movieThis = function(movie){
     //console.log(queryUrl);
 
     // Then create a request to the queryUrl
-    request(queryUrl, function(err, response, body){
+    request(queryUrl, function (err, response, body) {
         // If the request is successful
         if (!err && response.statusCode === 200) {
             // Need to return: Title, Year, IMDB Rating, Rotten Tomatoes Rating, Country, 
@@ -89,35 +80,29 @@ var movieThis = function(movie){
     })
 }
 
-// Using the `fs` Node package, LIRI will take the text inside of random.txt
-// and then use it to call one of LIRI's commands.
-var doWhatItSays = function(){
+var doWhatItSays = function () {
 
-    // read from file
     fs.readFile("random.txt", "utf8", function (err, data) {
-        if(err){
+        if (err) {
             return console.log(err)
         }
-        
-        var dataArr = data.split(",")
 
-        // call appropriate function and pass arguement
+        var dataArr = data.split(",")
         runAction(dataArr[0], dataArr[1])
     });
 }
 
-// This function will handle outputting to the console and writing to log file
-var outputData = function(data) {
+var outputData = function (data) {
     console.log(data)
 
-    fs.appendFile("log.txt", "\r\n" + data, function (err){
-        if(err){
+    fs.appendFile("log.txt", "\r\n" + data, function (err) {
+        if (err) {
             return console.log(err)
-        } 
+        }
     })
 }
 
-var runAction = function(func, parm) {
+var runAction = function (func, parm) {
     switch (func) {
         case "concert-this":
             concertThis(parm)
@@ -132,11 +117,11 @@ var runAction = function(func, parm) {
             doWhatItSays()
             break
         default:
-            outputData("That is not a command that I recognize, please try again.") 
+            outputData("That is not a command that I recognize, please try again.")
     }
 }
 
-runAction(process.argv[2], process.argv[3])   
+runAction(process.argv[2], process.argv[3])
 
 
 
